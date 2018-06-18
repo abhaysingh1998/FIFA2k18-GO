@@ -1,0 +1,6 @@
+{
+	"ImportPath": "github.com/heroku/go_fifa2k18",
+	"GoVersion": "go1.10",
+	"GodepVersion": "v80",
+	"Deps": []
+}
