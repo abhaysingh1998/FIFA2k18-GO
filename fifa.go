@@ -36,9 +36,22 @@ type AwayTeam struct {
 	Goals   int    `json:"goals"`
 }
 
+type AllTeams struct {
+	ID          int    `json:"id"`
+	Country     string `json:"country"`
+	FifaCode    string `json:"fifa_code"`
+	GroupID     int    `json:"group_id"`
+	GroupLetter string `json:"group_letter"`
+}
+
 type AllMatchesPage struct {
 	Title string
 	Match []Matches
+}
+
+type AllTeamsPage struct {
+	Title string
+	Teams []AllTeams
 }
 
 type HomePage struct {
@@ -82,10 +95,25 @@ func todayMatches(w http.ResponseWriter, r *http.Request) {
 	t.Execute(w, page)
 }
 
+func allteams(w http.ResponseWriter, r *http.Request) {
+	resp, err := http.Get("http://worldcup.sfg.io/teams/")
+	if err != nil {
+		fmt.Println("No json for you")
+	}
+	defer resp.Body.Close()
+	bytes, _ := ioutil.ReadAll(resp.Body)
+	var teams []AllTeams
+	json.Unmarshal(bytes, &teams)
+	page := AllTeamsPage{Title: "FIFA WORLDCUP 2K18 PARTICIPATING TEAMS", Teams: teams}
+	t, _ := template.ParseFiles("teams.html")
+	t.Execute(w, page)
+}
+
 func fifa(w http.ResponseWriter, r *http.Request) {
 	links := make(map[string]string)
-	links["/matches"] = "FIFA WORLDCUP 2K18 ALL MACTHES"
-	links["/matches/today"] = "ALL MACTHES TO BE PLAYED TODAY"
+	links["/teams"] = "LIST OF ALL THE TEAMS"
+	links["/matches"] = "LIST OF ALL THE MATCHES"
+	links["/matches/today"] = "LIST OF TODAY'S MATCHES"
 	page := HomePage{Title: "FIFA WORLDCUP 2K18", Links: links}
 	t, _ := template.ParseFiles("home.html")
 	t.Execute(w, page)
@@ -96,6 +124,7 @@ func main() {
 		Addr: ":" + os.Getenv("PORT"), //
 	}
 	http.HandleFunc("/", fifa)
+	http.HandleFunc("/teams", allteams)
 	http.HandleFunc("/matches", fifaMatches)
 	http.HandleFunc("/matches/today", todayMatches)
 	//http.ListenAndServe("localhost:8000", nil)
