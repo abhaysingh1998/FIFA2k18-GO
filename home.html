@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>FIFA2K18</title>
+</head>
+<body>
+    <h1 align="center">{{.Title}}</h1>
+    <ul>
+        {{ range $key,$value := .Links }}
+        <li><a href="{{ $key }}" target='_blank'>{{ $value }}</a></li>
+       {{ end }}    
+    </ul> 
+</body>
+</html>

@@ -11,6 +11,7 @@ import (
 )
 
 var wg sync.WaitGroup
+var matches []Matches
 
 type Matches struct {
 	Venue      string   `json:"venue"`
@@ -35,12 +36,15 @@ type AwayTeam struct {
 	Goals   int    `json:"goals"`
 }
 
-type FifaPage struct {
+type AllMatchesPage struct {
 	Title string
 	Match []Matches
 }
 
-var matches []Matches
+type HomePage struct {
+	Title string
+	Links map[string]string
+}
 
 func allmatches(c chan []Matches) {
 	defer wg.Done()
@@ -48,8 +52,8 @@ func allmatches(c chan []Matches) {
 	if err != nil {
 		fmt.Println("No json for you")
 	}
+	defer resp.Body.Close()
 	bytes, _ := ioutil.ReadAll(resp.Body)
-	resp.Body.Close()
 	json.Unmarshal(bytes, &matches)
 	c <- matches
 }
@@ -60,15 +64,31 @@ func fifaMatches(w http.ResponseWriter, r *http.Request) {
 	go allmatches(queue)
 	wg.Wait()
 	close(queue)
-	page := FifaPage{Title: "FIFA WORLDCUP 2K18 MATCHES", Match: matches}
-	t, _ := template.ParseFiles("fifa.html")
+	page := AllMatchesPage{Title: "FIFA WORLDCUP 2K18 MATCHES", Match: matches}
+	t, _ := template.ParseFiles("matches.html")
+	t.Execute(w, page)
+}
+
+func todayMatches(w http.ResponseWriter, r *http.Request) {
+	resp, err := http.Get("http://worldcup.sfg.io/matches/today")
+	if err != nil {
+		fmt.Println("No json for you")
+	}
+	defer resp.Body.Close()
+	bytes, _ := ioutil.ReadAll(resp.Body)
+	json.Unmarshal(bytes, &matches)
+	page := AllMatchesPage{Title: "FIFA WORLDCUP 2K18 TODAY'S BATTLES", Match: matches}
+	t, _ := template.ParseFiles("matches.html")
 	t.Execute(w, page)
 }
 
 func fifa(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, `<h1>Details of Every FIFA WORLDCUP 2K18 MATCHES</h1>
-		<a href="/matches" target='_blank'>All Matches</a>
-		`)
+	links := make(map[string]string)
+	links["/matches"] = "FIFA WORLDCUP 2K18 ALL MACTHES"
+	links["/matches/today"] = "ALL MACTHES TO BE PLAYED TODAY"
+	page := HomePage{Title: "FIFA WORLDCUP 2K18", Links: links}
+	t, _ := template.ParseFiles("home.html")
+	t.Execute(w, page)
 }
 
 func main() {
@@ -77,6 +97,7 @@ func main() {
 	}
 	http.HandleFunc("/", fifa)
 	http.HandleFunc("/matches", fifaMatches)
+	http.HandleFunc("/matches/today", todayMatches)
 	//http.ListenAndServe("localhost:8000", nil)
 	server.ListenAndServe()
 }
