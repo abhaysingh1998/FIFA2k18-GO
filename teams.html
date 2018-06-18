@@ -11,23 +11,31 @@
     <thead>
         <tr>
             <th>Country</th>
-            <th>FifaCode</th>
             <th>Group</th>
+            <th>Match Played</th>
+            <th>Won</th>
+            <th>Lost</th>
+            <th>Draw</th>
+            <th>Points</th>
         </tr>
     </thead>
     <tbody>
-        {{ range $key := .Teams }}
+        {{ range $key,$value := .Teams }}
          <tr>
             <td>{{ $key.Country }}</td>
-            <td>{{ $key.FifaCode }}</td>
             <td>{{ $key.GroupLetter }}</td>
+            <td>{{ $value.GamesPlayed }}</td>
+            <td>{{ $value.Wins }}</td>
+            <td>{{ $value.Losses }}</td>
+            <td>{{ $value.Draws }}</td>
+            <td>{{ $value.Points }}</td>
         </tr>
         {{ end }}
     </tbody>
 </table>
 <script>$(document).ready(function() {
     $('#fancytable').DataTable( {
-        "order": [ 2, 'asc' ],
+        "order": [[ 1, 'asc' ], [ 6, 'dsc' ], [0, 'asc']],
         "autowidth": true,
         "pageLength": 50
       } );

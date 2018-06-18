@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"sort"
 	"sync"
 )
 
@@ -44,6 +45,15 @@ type AllTeams struct {
 	GroupLetter string `json:"group_letter"`
 }
 
+type Stats struct {
+	ID          int `json:"id"`
+	GamesPlayed int `json:"games_played"`
+	Wins        int `json:"wins"`
+	Losses      int `json:"losses"`
+	Draws       int `json:"draws"`
+	Points      int `json:"points"`
+}
+
 type AllMatchesPage struct {
 	Title string
 	Match []Matches
@@ -51,7 +61,7 @@ type AllMatchesPage struct {
 
 type AllTeamsPage struct {
 	Title string
-	Teams []AllTeams
+	Teams map[AllTeams]Stats
 }
 
 type HomePage struct {
@@ -104,14 +114,32 @@ func allteams(w http.ResponseWriter, r *http.Request) {
 	bytes, _ := ioutil.ReadAll(resp.Body)
 	var teams []AllTeams
 	json.Unmarshal(bytes, &teams)
-	page := AllTeamsPage{Title: "FIFA WORLDCUP 2K18 PARTICIPATING TEAMS", Teams: teams}
+	response, err := http.Get("http://worldcup.sfg.io/teams/results")
+	if err != nil {
+		fmt.Println("No json for you")
+	}
+	defer response.Body.Close()
+	bites, _ := ioutil.ReadAll(response.Body)
+	var stats []Stats
+	json.Unmarshal(bites, &stats)
+	sort.Slice(teams, func(i, j int) bool {
+		return teams[i].ID < teams[j].ID
+	})
+	sort.Slice(stats, func(i, j int) bool {
+		return stats[i].ID < stats[j].ID
+	})
+	teamdetails := make(map[AllTeams]Stats)
+	for i := 0; i < len(teams); i++ {
+		teamdetails[teams[i]] = stats[i]
+	}
+	page := AllTeamsPage{Title: "POINTS TABLE(GROUPWISE) FIFA WORLDCUP 2K18", Teams: teamdetails}
 	t, _ := template.ParseFiles("teams.html")
 	t.Execute(w, page)
 }
 
 func fifa(w http.ResponseWriter, r *http.Request) {
 	links := make(map[string]string)
-	links["/teams"] = "LIST OF ALL THE TEAMS"
+	links["/teams"] = "STATISTICS/POINTS TABLE OF ALL THE TEAMS"
 	links["/matches"] = "LIST OF ALL THE MATCHES"
 	links["/matches/today"] = "LIST OF TODAY'S MATCHES"
 	page := HomePage{Title: "FIFA WORLDCUP 2K18", Links: links}
