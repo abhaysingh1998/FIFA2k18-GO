@@ -7,7 +7,10 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"sync"
 )
+
+var wg sync.WaitGroup
 
 type Matches struct {
 	Venue      string   `json:"venue"`
@@ -37,15 +40,26 @@ type FifaPage struct {
 	Match []Matches
 }
 
-func fifaMatches(w http.ResponseWriter, r *http.Request) {
+var matches []Matches
+
+func allmatches(c chan []Matches) {
+	defer wg.Done()
 	resp, err := http.Get("http://worldcup.sfg.io/matches")
 	if err != nil {
 		fmt.Println("No json for you")
 	}
 	bytes, _ := ioutil.ReadAll(resp.Body)
 	resp.Body.Close()
-	var matches []Matches
 	json.Unmarshal(bytes, &matches)
+	c <- matches
+}
+
+func fifaMatches(w http.ResponseWriter, r *http.Request) {
+	queue := make(chan []Matches, 50)
+	wg.Add(1)
+	go allmatches(queue)
+	wg.Wait()
+	close(queue)
 	page := FifaPage{Title: "FIFA WORLDCUP 2K18 MATCHES", Match: matches}
 	t, _ := template.ParseFiles("fifa.html")
 	t.Execute(w, page)
