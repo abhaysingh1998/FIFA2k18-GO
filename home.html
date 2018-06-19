@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" type="text/css" href="styles.css">
     <title>FIFA2K18</title>
     <style>
         ul {
@@ -23,6 +24,10 @@
         {{ range $key,$value := .Links }}
         <li><a href="{{ $key }}" target='_blank'>{{ $value }}</a></li><br>
        {{ end }}    
-    </ul> 
+    </ul> <br><br>
+    <div id="footer">
+        <a href="https://github.com/abhaysingh1998/FIFA2k18-GO"><p><center>Source Code</center></a>
+        <img style="display:block; margin: 0 auto" src="https://cdn0.iconfinder.com/data/icons/octicons/1024/mark-github-512.png"  height="25" width="25"></p>
+    </div>
 </body>
 </html>
