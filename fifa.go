@@ -71,7 +71,7 @@ type HomePage struct {
 
 func allmatches(c chan []Matches) {
 	defer wg.Done()
-	resp, err := http.Get(" https://world-cup-json.herokuapp.com/matches")
+	resp, err := http.Get("https://world-cup-json.herokuapp.com/matches")
 	if err != nil {
 		fmt.Println("No json for you")
 	}
@@ -93,7 +93,7 @@ func fifaMatches(w http.ResponseWriter, r *http.Request) {
 }
 
 func todayMatches(w http.ResponseWriter, r *http.Request) {
-	resp, err := http.Get(" https://world-cup-json.herokuapp.com/matches/today")
+	resp, err := http.Get("https://world-cup-json.herokuapp.com/matches/today")
 	if err != nil {
 		fmt.Println("No json for you")
 	}
@@ -106,7 +106,7 @@ func todayMatches(w http.ResponseWriter, r *http.Request) {
 }
 
 func allteams(w http.ResponseWriter, r *http.Request) {
-	resp, err := http.Get(" https://world-cup-json.herokuapp.com/teams/")
+	resp, err := http.Get("https://world-cup-json.herokuapp.com/teams/")
 	if err != nil {
 		fmt.Println("No json for you")
 	}
@@ -114,7 +114,7 @@ func allteams(w http.ResponseWriter, r *http.Request) {
 	bytes, _ := ioutil.ReadAll(resp.Body)
 	var teams []AllTeams
 	json.Unmarshal(bytes, &teams)
-	response, err := http.Get(" https://world-cup-json.herokuapp.com/teams/results")
+	response, err := http.Get("https://world-cup-json.herokuapp.com/teams/results")
 	if err != nil {
 		fmt.Println("No json for you")
 	}
