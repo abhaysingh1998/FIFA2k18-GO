@@ -139,7 +139,7 @@ func allteams(w http.ResponseWriter, r *http.Request) {
 
 func fifa(w http.ResponseWriter, r *http.Request) {
 	links := make(map[string]string)
-	links["/teams"] = "STATISTICS/POINTS TABLE OF ALL THE TEAMS"
+	links["/teams"] = "POINTS TABLE OF ALL THE TEAMS"
 	links["/matches"] = "LIST OF ALL THE MATCHES"
 	links["/matches/today"] = "LIST OF TODAY'S MATCHES"
 	page := HomePage{Title: "FIFA WORLDCUP 2K18", Links: links}

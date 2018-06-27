@@ -1,9 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="stylesheet" type="text/css" href="styles.css">
     <title>FIFA2K18</title>
     <style>
@@ -19,15 +14,14 @@
     </style>
 </head>
 <body>
-    <h1 align="center" style="font-size:60px;">{{.Title}}</h1>
+    <img style="display:block; margin: 0 auto" src="https://proxy.duckduckgo.com/iu/?u=https%3A%2F%2Ftse1.mm.bing.net%2Fth%3Fid%3DOIP.0_d_RIcxoKaKdyADHPf8PAHaIK%26pid%3D15.1&f=1"  height="250" width="250">
     <ul>
         {{ range $key,$value := .Links }}
         <li><a href="{{ $key }}" target='_blank'>{{ $value }}</a></li><br>
        {{ end }}    
-    </ul> <br><br>
+    </ul> <br>
     <div id="footer">
-        <a href="https://github.com/abhaysingh1998/FIFA2k18-GO"><p><center>Source Code</center></a>
-        <img style="display:block; margin: 0 auto" src="https://cdn0.iconfinder.com/data/icons/octicons/1024/mark-github-512.png"  height="25" width="25"></p>
+        <a href="https://github.com/abhaysingh1998/FIFA2k18-GO"><p><center>Source Code</center></p></a>
+        <img style="display:block; margin: 0 auto" src="https://cdn0.iconfinder.com/data/icons/octicons/1024/mark-github-512.png"  height="25" width="25">
     </div>
 </body>
-</html>
