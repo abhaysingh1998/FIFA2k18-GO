@@ -8,7 +8,9 @@ import (
 	"net/http"
 	"os"
 	"sort"
+	"strings"
 	"sync"
+	"time"
 )
 
 var wg sync.WaitGroup
@@ -69,6 +71,19 @@ type HomePage struct {
 	Links map[string]string
 }
 
+func date() {
+	for i := range matches {
+		t, err := time.Parse(time.RFC3339, matches[i].Datetiming)
+		if err != nil {
+			fmt.Println(err)
+		}
+		timestr := t.String()
+		pidx := strings.Index(timestr, "+")
+		uidx := strings.Index(timestr, "U")
+		matches[i].Datetiming = timestr[:pidx] + timestr[uidx:]
+	}
+}
+
 func allmatches(c chan []Matches) {
 	defer wg.Done()
 	resp, err := http.Get("https://world-cup-json.herokuapp.com/matches")
@@ -87,6 +102,7 @@ func fifaMatches(w http.ResponseWriter, r *http.Request) {
 	go allmatches(queue)
 	wg.Wait()
 	close(queue)
+	date()
 	page := AllMatchesPage{Title: "FIFA WORLDCUP 2K18 MATCHES", Match: matches}
 	t, _ := template.ParseFiles("matches.html")
 	t.Execute(w, page)
@@ -100,6 +116,7 @@ func todayMatches(w http.ResponseWriter, r *http.Request) {
 	defer resp.Body.Close()
 	bytes, _ := ioutil.ReadAll(resp.Body)
 	json.Unmarshal(bytes, &matches)
+	date()
 	page := AllMatchesPage{Title: "FIFA WORLDCUP 2K18 TODAY'S BATTLES", Match: matches}
 	t, _ := template.ParseFiles("matches.html")
 	t.Execute(w, page)
